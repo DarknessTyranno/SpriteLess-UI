@@ -1,0 +1,21 @@
+{
+  "name": "SpriteLessUI.Editor",
+  "rootNamespace": "SpriteLessUI.Editor",
+  "references": [
+    "SpriteLessUI.Runtime",
+    "UnityEngine.UI",
+    "UnityEditor.UI"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
+
