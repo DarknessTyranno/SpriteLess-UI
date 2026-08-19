@@ -3,6 +3,7 @@
   "version": "0.1.1",
   "displayName": "SpriteLess UI",
   "description": "Sprite-free geometry graphics for Unity uGUI.",
+  "license": "MIT",
   "unity": "2021.3",
   "dependencies": {
     "com.unity.ugui": "1.0.0"
