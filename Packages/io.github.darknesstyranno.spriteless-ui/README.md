@@ -50,7 +50,7 @@ Set `Raycast Area` to `Shape` for pointer input that follows non-rectangular geo
 Add the package from this Git URL:
 
 ```text
-https://github.com/DarknessTyranno/SpriteLess-UI.git?path=/Packages/io.github.darknesstyranno.spriteless-ui
+https://github.com/DarknessTyranno/SpriteLess-UI.git?path=/Packages/io.github.darknesstyranno.spriteless-ui#v0.1.1
 ```
 
 ## License

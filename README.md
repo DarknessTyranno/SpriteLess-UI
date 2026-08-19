@@ -36,7 +36,7 @@ SpriteLess UI has no dependency on TextMesh Pro, a Scriptable Render Pipeline, g
 Open `Window > Package Manager`, select **Install package from git URL**, and enter:
 
 ```text
-https://github.com/DarknessTyranno/SpriteLess-UI.git?path=/Packages/io.github.darknesstyranno.spriteless-ui
+https://github.com/DarknessTyranno/SpriteLess-UI.git?path=/Packages/io.github.darknesstyranno.spriteless-ui#v0.1.1
 ```
 
 ## Usage
