@@ -30,23 +30,34 @@ namespace SpriteLessUI.Geometry
             }
         }
 
-        public static void AddFilledPolygonTriangulated(
+        public static bool AddFilledPolygonTriangulated(
             VertexHelper vertexHelper,
             Vector2[] points,
             int pointCount,
             Color32 color,
-            int[] indexBuffer)
+            int[] indexBuffer,
+            int[] triangleBuffer)
         {
-            int vertexStart = vertexHelper.currentVertCount;
+            if (pointCount < 3)
+            {
+                return false;
+            }
+
             for (int i = 0; i < pointCount; i++)
             {
-                AddVertex(vertexHelper, points[i], color);
                 indexBuffer[i] = i;
             }
 
-            bool clockwise = SignedArea(points, pointCount) < 0f;
+            float signedArea = SignedArea(points, pointCount);
+            if (Mathf.Abs(signedArea) <= Mathf.Epsilon)
+            {
+                return false;
+            }
+
+            bool clockwise = signedArea < 0f;
             int remaining = pointCount;
             int guard = pointCount * pointCount;
+            int triangleIndexCount = 0;
             while (remaining > 2 && guard-- > 0)
             {
                 bool earFound = false;
@@ -67,10 +78,9 @@ namespace SpriteLessUI.Geometry
                         continue;
                     }
 
-                    vertexHelper.AddTriangle(
-                        vertexStart + previous,
-                        vertexStart + current,
-                        vertexStart + next);
+                    triangleBuffer[triangleIndexCount++] = previous;
+                    triangleBuffer[triangleIndexCount++] = current;
+                    triangleBuffer[triangleIndexCount++] = next;
                     RemoveIndex(indexBuffer, remaining, i);
                     remaining--;
                     earFound = true;
@@ -79,9 +89,30 @@ namespace SpriteLessUI.Geometry
 
                 if (!earFound)
                 {
-                    throw new System.InvalidOperationException("Generated stroke contour could not be triangulated.");
+                    return false;
                 }
             }
+
+            if (remaining > 2)
+            {
+                return false;
+            }
+
+            int vertexStart = vertexHelper.currentVertCount;
+            for (int i = 0; i < pointCount; i++)
+            {
+                AddVertex(vertexHelper, points[i], color);
+            }
+
+            for (int i = 0; i < triangleIndexCount; i += 3)
+            {
+                vertexHelper.AddTriangle(
+                    vertexStart + triangleBuffer[i],
+                    vertexStart + triangleBuffer[i + 1],
+                    vertexStart + triangleBuffer[i + 2]);
+            }
+
+            return true;
         }
 
         public static void AddRing(

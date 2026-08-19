@@ -1,6 +1,6 @@
 {
   "name": "io.github.darknesstyranno.spriteless-ui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "displayName": "SpriteLess UI",
   "description": "Sprite-free geometry graphics for Unity uGUI.",
   "unity": "2021.3",

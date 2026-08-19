@@ -546,6 +546,35 @@ namespace SpriteLessUI.Tests
             }
         }
 
+        [TestCase(0f)]
+        [TestCase(0.000001f)]
+        [TestCase(0.00001f)]
+        [TestCase(0.0001f)]
+        [TestCase(0.001f)]
+        [TestCase(0.01f)]
+        public void ChevronSupportsZeroAndThinThickness(float thickness)
+        {
+            m_Image.Shape = ProceduralShape.Chevron;
+            m_Image.ChevronThickness = thickness;
+            m_Image.AntiAliasingEnabled = true;
+            m_Image.AntiAliasingWidth = 1f;
+
+            foreach (ArcCap cap in new[] { ArcCap.Flat, ArcCap.Round })
+            {
+                foreach (StrokeJoin join in new[] { StrokeJoin.Miter, StrokeJoin.Round })
+                {
+                    m_Image.ChevronCap = cap;
+                    m_Image.ChevronJoin = join;
+
+                    Mesh mesh = null;
+                    Assert.DoesNotThrow(
+                        () => mesh = BuildMesh(),
+                        $"Thickness {thickness}, cap {cap}, join {join}");
+                    Object.DestroyImmediate(mesh);
+                }
+            }
+        }
+
         [Test]
         public void ArcWithFullSweepCreatesRing()
         {

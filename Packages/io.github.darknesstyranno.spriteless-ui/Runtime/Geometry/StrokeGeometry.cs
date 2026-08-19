@@ -55,7 +55,8 @@ namespace SpriteLessUI.Geometry
                     buffer.First,
                     outerPointCount,
                     color,
-                    buffer.Indices);
+                    buffer.Indices,
+                    buffer.Triangles);
                 return;
             }
 
@@ -74,6 +75,18 @@ namespace SpriteLessUI.Geometry
 
             Color32 transparent = color;
             transparent.a = 0;
+            bool fillAdded = GeometryWriter.AddFilledPolygonTriangulated(
+                vertexHelper,
+                buffer.Second,
+                innerPointCount,
+                color,
+                buffer.Indices,
+                buffer.Triangles);
+            if (!fillAdded)
+            {
+                return;
+            }
+
             GeometryWriter.AddRing(
                 vertexHelper,
                 buffer.First,
@@ -81,12 +94,6 @@ namespace SpriteLessUI.Geometry
                 buffer.Second,
                 color,
                 outerPointCount);
-            GeometryWriter.AddFilledPolygonTriangulated(
-                vertexHelper,
-                buffer.Second,
-                innerPointCount,
-                color,
-                buffer.Indices);
         }
 
         internal static bool ContainsPoint(

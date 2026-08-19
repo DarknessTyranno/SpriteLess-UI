@@ -33,7 +33,8 @@ namespace SpriteLessUI.Geometry
                     buffer.First,
                     PointCount,
                     fillColor,
-                    buffer.Indices);
+                    buffer.Indices,
+                    buffer.Triangles);
                 return;
             }
 
