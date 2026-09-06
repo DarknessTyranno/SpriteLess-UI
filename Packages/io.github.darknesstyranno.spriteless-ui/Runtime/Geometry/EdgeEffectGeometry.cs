@@ -392,7 +392,7 @@ namespace SpriteLessUI.Geometry
             return true;
         }
 
-        private static void AddDirectionalStrip(
+        internal static void AddDirectionalStrip(
             VertexHelper vertexHelper,
             Vector2[] outerPoints,
             Vector2[] innerPoints,

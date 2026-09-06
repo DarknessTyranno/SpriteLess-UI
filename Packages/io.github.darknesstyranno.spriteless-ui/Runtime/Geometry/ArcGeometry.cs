@@ -5,12 +5,12 @@ namespace SpriteLessUI.Geometry
 {
     internal static class ArcGeometry
     {
-        private const float ArcTargetLength = 4f;
+        private static float ArcTargetLength => 4f / TessellationQuality.Multiplier;
         private const float MinimumInnerRadius = 0.001f;
         private const int MinimumFullSegments = 16;
-        private const int MaximumFullSegments = 128;
+        private static int MaximumFullSegments => Mathf.CeilToInt(128 * TessellationQuality.Multiplier);
         private const int MinimumCapSegments = 4;
-        private const int MaximumCapSegments = 24;
+        private static int MaximumCapSegments => Mathf.CeilToInt(24 * TessellationQuality.Multiplier);
 
         public static void Build(
             VertexHelper vertexHelper,

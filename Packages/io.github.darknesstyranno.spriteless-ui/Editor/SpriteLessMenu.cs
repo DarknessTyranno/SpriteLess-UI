@@ -11,6 +11,13 @@ namespace SpriteLessUI.Editor
     {
         private const string MenuRoot = "GameObject/UI (Canvas)/SpriteLess/";
 
+        [MenuItem(MenuRoot + "Regular Polygon", false, 2110)]
+        private static void CreateRegularPolygon(MenuCommand command)
+        {
+            PlaceUnderCanvas(CreateGraphic("Regular Polygon", ProceduralShape.RegularPolygon,
+                new Vector2(100f, 100f), 0f, Color.white), command);
+        }
+
         [MenuItem(MenuRoot + "Rounded Rectangle", false, 2100)]
         private static void CreateRoundedRectangle(MenuCommand command)
         {

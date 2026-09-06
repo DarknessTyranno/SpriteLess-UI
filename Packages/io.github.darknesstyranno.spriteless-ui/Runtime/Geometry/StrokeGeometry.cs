@@ -7,10 +7,10 @@ namespace SpriteLessUI.Geometry
     {
         internal const float MiterLimit = 4f;
 
-        private const int MaximumContourPoints = 64;
-        private const int RoundCapSegments = 8;
-        private const int MaximumJoinSegments = 12;
-        private const float JoinSegmentAngle = 15f;
+        private static int MaximumContourPoints => Mathf.CeilToInt(64 * TessellationQuality.Multiplier);
+        private static int RoundCapSegments => Mathf.CeilToInt(8 * TessellationQuality.Multiplier);
+        private static int MaximumJoinSegments => Mathf.CeilToInt(12 * TessellationQuality.Multiplier);
+        private static float JoinSegmentAngle => 15f / TessellationQuality.Multiplier;
 
         public static void Build(
             VertexHelper vertexHelper,

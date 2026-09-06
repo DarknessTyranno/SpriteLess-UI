@@ -5,9 +5,9 @@ namespace SpriteLessUI.Geometry
 {
     internal static class CircleGeometry
     {
-        private const float ArcTargetLength = 4f;
+        private static float ArcTargetLength => 4f / TessellationQuality.Multiplier;
         private const int MinimumSegments = 16;
-        private const int MaximumSegments = 128;
+        private static int MaximumSegments => Mathf.CeilToInt(128 * TessellationQuality.Multiplier);
 
         public static void Build(
             VertexHelper vertexHelper,

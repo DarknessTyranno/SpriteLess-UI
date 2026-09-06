@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Regular Polygon corner rounding via `PolygonRadius`, including matching inside Border, AA, Edge Effect and Shape Raycast.
+- Shared circular polygon-corner tessellation utility for authored polygon integrations.
+- Regular Polygon shape with 3–64 sides, clockwise rotation, equal-edge fitting, Border, AA, Edge Effect and Shape Raycast.
+- Non-serialized mesh detail multiplier for temporary high-resolution captures; default runtime tessellation is unchanged.
+
 ## [0.1.0] - 2026-08-13
 
 ### Added

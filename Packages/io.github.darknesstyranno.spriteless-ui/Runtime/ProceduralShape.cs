@@ -7,6 +7,7 @@ namespace SpriteLessUI
         Quadrilateral = 2,
         Arc = 3,
         Triangle = 4,
-        Chevron = 5
+        Chevron = 5,
+        RegularPolygon = 6
     }
 }

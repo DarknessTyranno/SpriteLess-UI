@@ -12,6 +12,7 @@ SpriteLess UI creates common UI shapes directly from `RectTransform` geometry. I
 - Circle and Ellipse
 - Parallelogram, Trapezoid, and convex Quadrilateral
 - Isosceles, Equilateral, and Right Triangle types
+- Regular Polygon with 3–64 equal sides, rotation, Border, AA, Edge Effect and Shape Raycast
 - Chevron with Stretch or Equilateral proportions, direction, thickness, spread, cap, and join controls
 - Arc and Ring with Flat or Round caps
 - Uniform or individual corner radii
@@ -49,7 +50,9 @@ GameObject > UI (Canvas) > SpriteLess
 
 Or add `SpriteLessImage` to a UI GameObject and select a shape in the Inspector.
 
-Available presets include Rounded Rectangle, Circle, Parallelogram, Trapezoid, Ring, Arc, Triangle, Chevron, Panel, Button, and Slider.
+Available presets include Rounded Rectangle, Circle, Parallelogram, Trapezoid, Ring, Arc, Triangle, Chevron, Regular Polygon, Panel, Button, and Slider.
+
+Regular Polygon preserves equal edge lengths while fitting into the RectTransform. Set `Sides` and `Rotation` in the Inspector; use `PolygonSides` and `PolygonRotation` in code.
 
 ### Triangle and Chevron
 

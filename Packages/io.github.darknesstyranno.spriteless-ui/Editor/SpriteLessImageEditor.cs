@@ -8,6 +8,8 @@ namespace SpriteLessUI.Editor
     public sealed class SpriteLessImageEditor : GraphicEditor
     {
         private SerializedProperty m_Shape;
+        private SerializedProperty m_PolygonSides;
+        private SerializedProperty m_PolygonRotation;
         private SerializedProperty m_RaycastMode;
         private SerializedProperty m_UseIndividualCornerRadii;
         private SerializedProperty m_CornerRadius;
@@ -39,6 +41,8 @@ namespace SpriteLessUI.Editor
         {
             base.OnEnable();
             m_Shape = serializedObject.FindProperty("m_Shape");
+            m_PolygonSides = serializedObject.FindProperty("m_PolygonSides");
+            m_PolygonRotation = serializedObject.FindProperty("m_PolygonRotation");
             m_RaycastMode = serializedObject.FindProperty("m_RaycastMode");
             m_UseIndividualCornerRadii = serializedObject.FindProperty("m_UseIndividualCornerRadii");
             m_CornerRadius = serializedObject.FindProperty("m_CornerRadius");
@@ -113,6 +117,12 @@ namespace SpriteLessUI.Editor
         {
             switch (shape)
             {
+                case ProceduralShape.RegularPolygon:
+                    EditorGUILayout.PropertyField(m_PolygonSides, new GUIContent("Sides"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("m_PolygonRadius"), new GUIContent("Radius"));
+                    EditorGUILayout.PropertyField(m_PolygonRotation, new GUIContent("Rotation", "Clockwise rotation from a top vertex. Fits without stretching."));
+                    break;
+
                 case ProceduralShape.RoundedRectangle:
                     DrawCornerSettings();
                     break;

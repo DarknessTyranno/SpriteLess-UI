@@ -15,6 +15,9 @@ namespace SpriteLessUI
         [SerializeField] private CornerRadii m_CornerRadii = new CornerRadii(12f, 12f, 12f, 12f);
 
         [SerializeField] private CornerOffsets m_CornerOffsets;
+        [SerializeField, Range(3, 64)] private int m_PolygonSides = 5;
+        [SerializeField] private float m_PolygonRotation;
+        [SerializeField, Min(0f)] private float m_PolygonRadius;
 
         [SerializeField] private ShapeDirection m_Direction = ShapeDirection.Up;
         [SerializeField] private TriangleType m_TriangleType = TriangleType.Isosceles;
@@ -43,6 +46,20 @@ namespace SpriteLessUI
         [SerializeField, Min(0f)] private float m_AntiAliasingWidth = 1f;
 
         private readonly ShapePointBuffer m_PointBuffer = new ShapePointBuffer();
+        private float m_MeshDetailScale = 1f;
+
+        /// <summary>Non-serialized tessellation multiplier for temporary high-resolution captures.</summary>
+        public float MeshDetailScale
+        {
+            get => m_MeshDetailScale;
+            set
+            {
+                value = float.IsNaN(value) ? 1f : Mathf.Clamp(value, 1f, 8f);
+                if (Mathf.Approximately(m_MeshDetailScale, value)) return;
+                m_MeshDetailScale = value;
+                SetVerticesDirty();
+            }
+        }
 
         public ProceduralShape Shape
         {
@@ -55,6 +72,42 @@ namespace SpriteLessUI
                 }
 
                 m_Shape = value;
+                SetVerticesDirty();
+            }
+        }
+
+        public int PolygonSides
+        {
+            get => m_PolygonSides;
+            set
+            {
+                value = Mathf.Clamp(value, 3, 64);
+                if (m_PolygonSides == value) return;
+                m_PolygonSides = value;
+                SetVerticesDirty();
+            }
+        }
+
+        public float PolygonRotation
+        {
+            get => m_PolygonRotation;
+            set
+            {
+                value = float.IsNaN(value) || float.IsInfinity(value) ? 0f : Mathf.Repeat(value, 360f);
+                if (Mathf.Approximately(m_PolygonRotation, value)) return;
+                m_PolygonRotation = value;
+                SetVerticesDirty();
+            }
+        }
+
+        public float PolygonRadius
+        {
+            get => m_PolygonRadius;
+            set
+            {
+                value = float.IsNaN(value) || float.IsInfinity(value) ? 0f : Mathf.Max(0f, value);
+                if (Mathf.Approximately(m_PolygonRadius, value)) return;
+                m_PolygonRadius = value;
                 SetVerticesDirty();
             }
         }
@@ -477,8 +530,13 @@ namespace SpriteLessUI
         internal bool ContainsLocalPoint(Vector2 localPoint)
         {
             Rect rect = GetPixelAdjustedRect();
+            if (rect.width <= 0f || rect.height <= 0f) return false;
             switch (m_Shape)
             {
+                case ProceduralShape.RegularPolygon:
+                    int polygonCount = RegularPolygonGeometry.BuildRoundedPerimeter(rect, m_PolygonSides, m_PolygonRotation, m_PolygonRadius, m_PointBuffer);
+                    return GeometryRaycast.ContainsPolygon(localPoint, m_PointBuffer.First, polygonCount);
+
                 case ProceduralShape.RoundedRectangle:
                     return GeometryRaycast.ContainsRoundedRectangle(
                         localPoint,
@@ -547,6 +605,14 @@ namespace SpriteLessUI
 
         internal void PopulateMesh(VertexHelper vertexHelper)
         {
+            float previous = TessellationQuality.Scale;
+            TessellationQuality.Scale = m_MeshDetailScale;
+            try { PopulateMeshCore(vertexHelper); }
+            finally { TessellationQuality.Scale = previous; }
+        }
+
+        private void PopulateMeshCore(VertexHelper vertexHelper)
+        {
             vertexHelper.Clear();
 
             Rect rect = GetPixelAdjustedRect();
@@ -560,6 +626,12 @@ namespace SpriteLessUI
 
             switch (m_Shape)
             {
+                case ProceduralShape.RegularPolygon:
+                    RegularPolygonGeometry.Build(vertexHelper, rect, m_PolygonSides, m_PolygonRotation,
+                        fillColor, m_BorderEnabled, m_BorderWidth, borderColor,
+                        m_AntiAliasingEnabled, m_AntiAliasingWidth, m_PointBuffer, m_PolygonRadius);
+                    break;
+
                 case ProceduralShape.RoundedRectangle:
                     RoundedRectangleGeometry.Build(
                         vertexHelper,
@@ -677,6 +749,24 @@ namespace SpriteLessUI
             Color32 effectColor = m_EdgeEffectColor;
             switch (m_Shape)
             {
+                case ProceduralShape.RegularPolygon:
+                    int polygonSegments = PolygonRounding.Segments(m_PolygonRadius, TessellationQuality.Multiplier);
+                    m_PointBuffer.EnsureCapacity(m_PolygonSides * (polygonSegments + 1));
+                    int polygonCount = RegularPolygonGeometry.BuildRoundedPerimeter(rect, m_PolygonSides, m_PolygonRotation,
+                        m_PolygonRadius, 0f, polygonSegments, m_PointBuffer.First, out float inradius);
+                    float inset = (m_BorderEnabled ? m_BorderWidth : 0f) + (m_AntiAliasingEnabled ? m_AntiAliasingWidth : 0f);
+                    float effectWidth = Mathf.Min(m_EdgeEffectWidth, inradius - inset - 0.001f);
+                    if (effectWidth > 0f && m_EdgeEffectDirection.sqrMagnitude > 0f)
+                    {
+                        RegularPolygonGeometry.BuildRoundedPerimeter(rect, m_PolygonSides, m_PolygonRotation, m_PolygonRadius,
+                            inset, polygonSegments, m_PointBuffer.Second, out _);
+                        RegularPolygonGeometry.BuildRoundedPerimeter(rect, m_PolygonSides, m_PolygonRotation, m_PolygonRadius,
+                            inset + effectWidth, polygonSegments, m_PointBuffer.Third, out _);
+                        EdgeEffectGeometry.AddDirectionalStrip(vertexHelper, m_PointBuffer.Second, m_PointBuffer.Third,
+                            polygonCount, m_EdgeEffectDirection, effectColor);
+                    }
+                    break;
+
                 case ProceduralShape.RoundedRectangle:
                     EdgeEffectGeometry.BuildRoundedRectangle(
                         vertexHelper,
@@ -757,6 +847,10 @@ namespace SpriteLessUI
 #if UNITY_EDITOR
         protected override void OnValidate()
         {
+            m_PolygonSides = Mathf.Clamp(m_PolygonSides, 3, 64);
+            m_PolygonRadius = float.IsNaN(m_PolygonRadius) || float.IsInfinity(m_PolygonRadius) ? 0f : Mathf.Max(0f, m_PolygonRadius);
+            m_PolygonRotation = float.IsNaN(m_PolygonRotation) || float.IsInfinity(m_PolygonRotation)
+                ? 0f : Mathf.Repeat(m_PolygonRotation, 360f);
             m_CornerRadius = Mathf.Max(0f, m_CornerRadius);
             m_CornerRadii = m_CornerRadii.Clamped();
             m_ArcThickness = Mathf.Max(0f, m_ArcThickness);

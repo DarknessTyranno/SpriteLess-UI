@@ -5,9 +5,9 @@ namespace SpriteLessUI.Geometry
 {
     internal static class RoundedRectangleGeometry
     {
-        private const float ArcTargetLength = 4f;
+        private static float ArcTargetLength => 4f / TessellationQuality.Multiplier;
         private const int MinimumCornerSegments = 2;
-        private const int MaximumCornerSegments = 12;
+        private static int MaximumCornerSegments => Mathf.CeilToInt(12 * TessellationQuality.Multiplier);
 
         public static void Build(
             VertexHelper vertexHelper,

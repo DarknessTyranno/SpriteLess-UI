@@ -18,6 +18,7 @@ No TextMesh Pro, Scriptable Render Pipeline, generated texture, or custom shader
 - Circle and Ellipse through RectTransform sizing
 - Parallelogram, Trapezoid, and convex Quadrilateral through per-corner XY offsets
 - Isosceles, Equilateral, and Right Triangle types
+- Regular Polygon with 3–64 equal sides and clockwise rotation, fitted without stretching
 - Chevron through Stretch or Equilateral proportions, direction, thickness, spread, cap, and join controls
 - Ring and Arc through thickness, start angle, signed sweep angle, and cap style
 - Individual corner radii
@@ -38,6 +39,10 @@ Create an element from `GameObject > UI (Canvas) > SpriteLess`, or add a `Sprite
 Equilateral Chevron preserves the proportions of two sides of an equilateral triangle while fitting inside the RectTransform.
 
 Triangle supports RectTransform-filling Isosceles, fitted Equilateral, and four-corner Right Triangle layouts.
+
+Regular Polygon uses `PolygonSides`, `PolygonRotation`, and `PolygonRadius` (default 0). The sharp base polygon keeps equal edges in non-square rectangles; Radius rounds its corners without moving its control vertices. Border, Edge Effect, AA and Shape Raycast follow the rounded perimeter. Radius is limited by the available edge length.
+
+`MeshDetailScale` is a non-serialized capture hook (1–8). The default is 1; capture tools can increase it on temporary copies without changing saved/runtime defaults.
 
 Every vertex uses RectTransform-normalized `uv0` coordinates from bottom-left `(0, 0)` to top-right `(1, 1)`.
 
