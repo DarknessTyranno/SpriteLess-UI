@@ -1,9 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [0.2.0] - 2026-09-07
 
 ### Added
 
+- `PolygonCentered` / Center on Rect keeps the polygon circumcenter and size stable during rotation without changing the RectTransform.
 - Regular Polygon corner rounding via `PolygonRadius`, including matching inside Border, AA, Edge Effect and Shape Raycast.
 - Shared circular polygon-corner tessellation utility for authored polygon integrations.
 - Regular Polygon shape with 3–64 sides, clockwise rotation, equal-edge fitting, Border, AA, Edge Effect and Shape Raycast.

@@ -17,6 +17,7 @@ namespace SpriteLessUI
         [SerializeField] private CornerOffsets m_CornerOffsets;
         [SerializeField, Range(3, 64)] private int m_PolygonSides = 5;
         [SerializeField] private float m_PolygonRotation;
+        [SerializeField] private bool m_PolygonCentered;
         [SerializeField, Min(0f)] private float m_PolygonRadius;
 
         [SerializeField] private ShapeDirection m_Direction = ShapeDirection.Up;
@@ -96,6 +97,18 @@ namespace SpriteLessUI
                 value = float.IsNaN(value) || float.IsInfinity(value) ? 0f : Mathf.Repeat(value, 360f);
                 if (Mathf.Approximately(m_PolygonRotation, value)) return;
                 m_PolygonRotation = value;
+                SetVerticesDirty();
+            }
+        }
+
+        /// <summary>Use a fixed circumcircle at the RectTransform center instead of fitting the polygon bounds.</summary>
+        public bool PolygonCentered
+        {
+            get => m_PolygonCentered;
+            set
+            {
+                if (m_PolygonCentered == value) return;
+                m_PolygonCentered = value;
                 SetVerticesDirty();
             }
         }
@@ -534,7 +547,7 @@ namespace SpriteLessUI
             switch (m_Shape)
             {
                 case ProceduralShape.RegularPolygon:
-                    int polygonCount = RegularPolygonGeometry.BuildRoundedPerimeter(rect, m_PolygonSides, m_PolygonRotation, m_PolygonRadius, m_PointBuffer);
+                    int polygonCount = RegularPolygonGeometry.BuildRoundedPerimeter(rect, m_PolygonSides, m_PolygonRotation, m_PolygonRadius, m_PointBuffer, m_PolygonCentered);
                     return GeometryRaycast.ContainsPolygon(localPoint, m_PointBuffer.First, polygonCount);
 
                 case ProceduralShape.RoundedRectangle:
@@ -629,7 +642,7 @@ namespace SpriteLessUI
                 case ProceduralShape.RegularPolygon:
                     RegularPolygonGeometry.Build(vertexHelper, rect, m_PolygonSides, m_PolygonRotation,
                         fillColor, m_BorderEnabled, m_BorderWidth, borderColor,
-                        m_AntiAliasingEnabled, m_AntiAliasingWidth, m_PointBuffer, m_PolygonRadius);
+                        m_AntiAliasingEnabled, m_AntiAliasingWidth, m_PointBuffer, m_PolygonRadius, m_PolygonCentered);
                     break;
 
                 case ProceduralShape.RoundedRectangle:
@@ -753,15 +766,15 @@ namespace SpriteLessUI
                     int polygonSegments = PolygonRounding.Segments(m_PolygonRadius, TessellationQuality.Multiplier);
                     m_PointBuffer.EnsureCapacity(m_PolygonSides * (polygonSegments + 1));
                     int polygonCount = RegularPolygonGeometry.BuildRoundedPerimeter(rect, m_PolygonSides, m_PolygonRotation,
-                        m_PolygonRadius, 0f, polygonSegments, m_PointBuffer.First, out float inradius);
+                        m_PolygonRadius, 0f, polygonSegments, m_PointBuffer.First, out float inradius, m_PolygonCentered);
                     float inset = (m_BorderEnabled ? m_BorderWidth : 0f) + (m_AntiAliasingEnabled ? m_AntiAliasingWidth : 0f);
                     float effectWidth = Mathf.Min(m_EdgeEffectWidth, inradius - inset - 0.001f);
                     if (effectWidth > 0f && m_EdgeEffectDirection.sqrMagnitude > 0f)
                     {
                         RegularPolygonGeometry.BuildRoundedPerimeter(rect, m_PolygonSides, m_PolygonRotation, m_PolygonRadius,
-                            inset, polygonSegments, m_PointBuffer.Second, out _);
+                            inset, polygonSegments, m_PointBuffer.Second, out _, m_PolygonCentered);
                         RegularPolygonGeometry.BuildRoundedPerimeter(rect, m_PolygonSides, m_PolygonRotation, m_PolygonRadius,
-                            inset + effectWidth, polygonSegments, m_PointBuffer.Third, out _);
+                            inset + effectWidth, polygonSegments, m_PointBuffer.Third, out _, m_PolygonCentered);
                         EdgeEffectGeometry.AddDirectionalStrip(vertexHelper, m_PointBuffer.Second, m_PointBuffer.Third,
                             polygonCount, m_EdgeEffectDirection, effectColor);
                     }

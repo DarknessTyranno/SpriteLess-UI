@@ -9,7 +9,7 @@ namespace SpriteLessUI.Geometry
         public const int MaximumSides = 64;
 
         // Uniform fitting keeps every edge equal even in a non-square RectTransform.
-        public static float BuildPerimeter(Rect rect, int sides, float rotation, Vector2[] points)
+        public static float BuildPerimeter(Rect rect, int sides, float rotation, Vector2[] points, bool centered = false)
         {
             Vector2 min = Vector2.one * float.MaxValue;
             Vector2 max = Vector2.one * float.MinValue;
@@ -21,17 +21,19 @@ namespace SpriteLessUI.Geometry
                 max = Vector2.Max(max, points[i]);
             }
 
-            float radius = Mathf.Min(rect.width / (max.x - min.x), rect.height / (max.y - min.y));
-            Vector2 offset = rect.center - (min + max) * (radius * 0.5f);
+            // A fixed circumcircle keeps both the center and size stable while rotating.
+            float radius = centered ? Mathf.Min(rect.width, rect.height) * 0.5f
+                : Mathf.Min(rect.width / (max.x - min.x), rect.height / (max.y - min.y));
+            Vector2 offset = centered ? rect.center : rect.center - (min + max) * (radius * 0.5f);
             for (int i = 0; i < sides; i++)
                 points[i] = offset + points[i] * radius;
             return radius * Mathf.Cos(Mathf.PI / sides);
         }
 
         public static int BuildRoundedPerimeter(Rect rect, int sides, float rotation, float radius,
-            float inset, int segments, Vector2[] points, out float inradius)
+            float inset, int segments, Vector2[] points, out float inradius, bool centered = false)
         {
-            inradius = BuildPerimeter(rect, sides, rotation, points);
+            inradius = BuildPerimeter(rect, sides, rotation, points, centered);
             Vector2 center = Vector2.zero;
             for (int i = 0; i < sides; i++) center += points[i];
             center /= sides;
@@ -47,26 +49,26 @@ namespace SpriteLessUI.Geometry
             return sides * (segments + 1);
         }
 
-        public static int BuildRoundedPerimeter(Rect rect, int sides, float rotation, float radius, ShapePointBuffer buffer)
+        public static int BuildRoundedPerimeter(Rect rect, int sides, float rotation, float radius, ShapePointBuffer buffer, bool centered = false)
         {
             int segments = PolygonRounding.Segments(radius, TessellationQuality.Multiplier);
             buffer.EnsureCapacity(sides * (segments + 1));
-            return BuildRoundedPerimeter(rect, sides, rotation, radius, 0f, segments, buffer.First, out _);
+            return BuildRoundedPerimeter(rect, sides, rotation, radius, 0f, segments, buffer.First, out _, centered);
         }
 
         public static void Build(VertexHelper vh, Rect rect, int sides, float rotation,
             Color32 fill, bool borderEnabled, float borderWidth, Color32 border,
-            bool aa, float aaWidth, ShapePointBuffer buffer, float radius = 0f)
+            bool aa, float aaWidth, ShapePointBuffer buffer, float radius = 0f, bool centered = false)
         {
             int segments = PolygonRounding.Segments(radius, TessellationQuality.Multiplier);
             buffer.EnsureCapacity(sides * (segments + 1));
-            int count = BuildRoundedPerimeter(rect, sides, rotation, radius, 0f, segments, buffer.First, out float inradius);
+            int count = BuildRoundedPerimeter(rect, sides, rotation, radius, 0f, segments, buffer.First, out float inradius, centered);
             float width = borderEnabled ? Mathf.Clamp(borderWidth, 0f, inradius) : 0f;
             bool hasBorder = width > 0f;
             bool solidBorder = hasBorder && width >= inradius - 0.00001f;
             Color32 outerColor = hasBorder ? border : fill;
             float outerAa = aa ? Mathf.Min(aaWidth, hasBorder ? width : inradius * 0.99f) : 0f;
-            BuildRoundedPerimeter(rect, sides, rotation, radius, outerAa, segments, buffer.Second, out _);
+            BuildRoundedPerimeter(rect, sides, rotation, radius, outerAa, segments, buffer.Second, out _, centered);
             if (outerAa > 0f)
             {
                 Color32 transparent = outerColor; transparent.a = 0;
@@ -77,10 +79,10 @@ namespace SpriteLessUI.Geometry
                 GeometryWriter.AddFilledPolygon(vh, Center(buffer.Second, count), buffer.Second, count, outerColor);
                 return;
             }
-            BuildRoundedPerimeter(rect, sides, rotation, radius, width, segments, buffer.Third, out _);
+            BuildRoundedPerimeter(rect, sides, rotation, radius, width, segments, buffer.Third, out _, centered);
             GeometryWriter.AddRing(vh, buffer.Second, border, buffer.Third, border, count);
             float innerAa = aa ? Mathf.Min(aaWidth, (inradius - width) * 0.99f) : 0f;
-            BuildRoundedPerimeter(rect, sides, rotation, radius, width + innerAa, segments, buffer.Fourth, out _);
+            BuildRoundedPerimeter(rect, sides, rotation, radius, width + innerAa, segments, buffer.Fourth, out _, centered);
             if (innerAa > 0f) GeometryWriter.AddRing(vh, buffer.Third, border, buffer.Fourth, fill, count);
             GeometryWriter.AddFilledPolygon(vh, Center(buffer.Fourth, count), buffer.Fourth, count, fill);
         }

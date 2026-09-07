@@ -119,6 +119,7 @@ namespace SpriteLessUI.Editor
             {
                 case ProceduralShape.RegularPolygon:
                     EditorGUILayout.PropertyField(m_PolygonSides, new GUIContent("Sides"));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("m_PolygonCentered"), new GUIContent("Center on Rect", "Keep the polygon center at the RectTransform center. Uses a fixed circumcircle inside the shorter rect dimension, so rotation does not change its size. Off fits the polygon bounds."));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty("m_PolygonRadius"), new GUIContent("Radius"));
                     EditorGUILayout.PropertyField(m_PolygonRotation, new GUIContent("Rotation", "Clockwise rotation from a top vertex. Fits without stretching."));
                     break;

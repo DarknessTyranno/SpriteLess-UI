@@ -42,6 +42,8 @@ Triangle supports RectTransform-filling Isosceles, fitted Equilateral, and four-
 
 Regular Polygon uses `PolygonSides`, `PolygonRotation`, and `PolygonRadius` (default 0). The sharp base polygon keeps equal edges in non-square rectangles; Radius rounds its corners without moving its control vertices. Border, Edge Effect, AA and Shape Raycast follow the rounded perimeter. Radius is limited by the available edge length.
 
+Enable **Center on Rect** (`PolygonCentered`) to keep the polygon center at the RectTransform center. Its circumradius is half the shorter rect dimension, so rotation keeps the same center and size, with possible extra space at the edges. Off (default) preserves the existing bounds-fit behavior. RectTransform pivot and size are not modified.
+
 `MeshDetailScale` is a non-serialized capture hook (1–8). The default is 1; capture tools can increase it on temporary copies without changing saved/runtime defaults.
 
 Every vertex uses RectTransform-normalized `uv0` coordinates from bottom-left `(0, 0)` to top-right `(1, 1)`.

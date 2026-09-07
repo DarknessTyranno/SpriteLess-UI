@@ -7,6 +7,66 @@ namespace SpriteLessUI.Tests
 {
     public sealed class RegularPolygonTests
     {
+        [TestCase(3)] [TestCase(4)] [TestCase(5)] [TestCase(64)]
+        public void CenteredPolygonKeepsCircumcenterAndRadiusWhileRotating(int sides)
+        {
+            // A noncentral pivot must still use rect.center, not local zero.
+            var rect = new Rect(-30, -70, 240, 100);
+            var points = new Vector2[sides];
+            for (int rotation = 0; rotation < 360; rotation += 17)
+            {
+                RegularPolygonGeometry.BuildPerimeter(rect, sides, rotation, points, true);
+                Vector2 center = Vector2.zero;
+                for (int i = 0; i < sides; i++)
+                {
+                    center += points[i];
+                    Assert.That(Vector2.Distance(points[i], rect.center), Is.EqualTo(50).Within(0.001f));
+                    Assert.That(points[i].x, Is.InRange(rect.xMin - 0.001f, rect.xMax + 0.001f));
+                    Assert.That(points[i].y, Is.InRange(rect.yMin - 0.001f, rect.yMax + 0.001f));
+                }
+                Assert.That(Vector2.Distance(center / sides, rect.center), Is.LessThan(0.001f));
+            }
+        }
+
+        [Test]
+        public void CenterOptionPreservesDefaultAndUpdatesMeshAndRaycast()
+        {
+            var go = new GameObject("Centered square", typeof(RectTransform), typeof(SpriteLessImage));
+            try
+            {
+                var image = go.GetComponent<SpriteLessImage>();
+                image.rectTransform.sizeDelta = new Vector2(100, 100);
+                image.Shape = ProceduralShape.RegularPolygon;
+                image.PolygonSides = 4;
+                image.PolygonRotation = 45;
+                Assert.That(image.PolygonCentered, Is.False);
+                Assert.That(image.ContainsLocalPoint(new Vector2(45, 0)), Is.True);
+                image.PolygonCentered = true;
+                Assert.That(image.ContainsLocalPoint(new Vector2(45, 0)), Is.False);
+                Assert.That(image.ContainsLocalPoint(Vector2.zero), Is.True);
+                image.PolygonRadius = 6;
+                image.BorderEnabled = true;
+                image.BorderWidth = 3;
+                image.EdgeEffectEnabled = true;
+                using (var vh = new VertexHelper())
+                {
+                    image.PopulateMesh(vh);
+                    var vertex = new UIVertex();
+                    Assert.That(vh.currentVertCount, Is.GreaterThan(0));
+                    for (int i = 0; i < vh.currentVertCount; i++)
+                    {
+                        vh.PopulateUIVertex(ref vertex, i);
+                        Assert.That(Mathf.Abs(vertex.position.x), Is.LessThanOrEqualTo(35.357f));
+                        Assert.That(Mathf.Abs(vertex.position.y), Is.LessThanOrEqualTo(35.357f));
+                    }
+                }
+                image.PolygonCentered = false;
+                Assert.That(image.ContainsLocalPoint(new Vector2(45, 0)), Is.True);
+                Assert.That(image.rectTransform.sizeDelta, Is.EqualTo(new Vector2(100, 100)));
+            }
+            finally { Object.DestroyImmediate(go); }
+        }
+
         [TestCase(3, 0f, 0f)] [TestCase(4, 0.000001f, 0.000001f)]
         [TestCase(5, 15f, 4f)] [TestCase(64, 1000f, 20f)] [TestCase(3, 1000f, 1000f)]
         public void RoundedPolygonRemainsFiniteAndWithinRect(int sides, float radius, float border)
