@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.1] - 2026-09-10
+
+### Added
+
+- Packaged editor icon for the SpriteLessImage script.
+
 ## [0.2.0] - 2026-09-07
 
 ### Added
