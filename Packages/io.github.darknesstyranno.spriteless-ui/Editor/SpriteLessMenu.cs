@@ -11,6 +11,15 @@ namespace SpriteLessUI.Editor
     {
         private const string MenuRoot = "GameObject/UI (Canvas)/SpriteLess/";
 
+        [MenuItem(MenuRoot + "Line", false, 2108)]
+        private static void CreateLine(MenuCommand command)
+        {
+            var line = ObjectFactory.CreateGameObject("SpriteLess Line", typeof(RectTransform), typeof(SpriteLessLine));
+            line.GetComponent<RectTransform>().sizeDelta = new Vector2(160f, 80f);
+            line.GetComponent<SpriteLessLine>().raycastTarget = false;
+            PlaceUnderCanvas(line, command);
+        }
+
         [MenuItem(MenuRoot + "Regular Polygon", false, 2110)]
         private static void CreateRegularPolygon(MenuCommand command)
         {

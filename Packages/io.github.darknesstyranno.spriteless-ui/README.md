@@ -21,6 +21,7 @@ No TextMesh Pro, Scriptable Render Pipeline, generated texture, or custom shader
 - Regular Polygon with 3–64 equal sides and clockwise rotation, fitted without stretching
 - Chevron through Stretch or Equilateral proportions, direction, thickness, spread, cap, and join controls
 - Ring and Arc through thickness, start angle, signed sweep angle, and cap style
+- SpriteLessLine: editable straight lines and open polylines with flat/round caps and miter/round joins
 - Individual corner radii
 - Inside border with an anti-aliased inner edge
 - Directional inset edge color for lightweight button and panel depth
@@ -51,6 +52,17 @@ Every vertex uses RectTransform-normalized `uv0` coordinates from bottom-left `(
 Assign uGUI-compatible custom materials through the `Material` field in the SpriteLessImage Inspector.
 
 Set `Raycast Area` to `Shape` for pointer input that follows non-rectangular geometry. The default `Rect Transform` option preserves standard uGUI behavior.
+
+### SpriteLessLine
+
+Create **GameObject > UI (Canvas) > SpriteLess > Line**. Adjust Thickness, Color, Cap, Join and AA in the Inspector.
+Drag points in Scene view, **Shift-drag either endpoint** to extend the line, click a segment midpoint to insert a point, or use **Remove Selected Point**. Each endpoint drag adds one point and supports a single Undo; Escape cancels it. Clicking without dragging does not add a point. You can also edit the Inspector's Normalized Points list.
+
+Points use RectTransform coordinates: `(0, 0)` is bottom-left and `(1, 1)` is top-right. Resizing the rect moves the points without changing the thickness in UI units. The stroke is centered on its path, so keep enough room for its width and caps. Points outside 0–1 are permitted but can be clipped by parent masks or baking bounds.
+
+`SetPoints(Vector2[])` accepts 2–256 points and copies the input. Consecutive duplicates are ignored when drawing; zero thickness or an entirely collapsed path produces no mesh. Sharp/short joins are limited to avoid spikes. Self-intersections and retraced segments overlap; they are not polygon-unioned and can darken translucent lines.
+
+Line supports the usual uGUI Material, Mask and RectMask2D. Raycast Target is off for newly created lines; when enabled it uses the standard rectangular hit area, not a stroke-only hit area. Bézier curves, closed paths, dashed lines and variable width are not included.
 
 ## Installation
 

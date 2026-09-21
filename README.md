@@ -15,12 +15,13 @@ SpriteLess UI creates common UI shapes directly from `RectTransform` geometry. I
 - Regular Polygon with 3–64 equal sides, corner rounding, stable-center rotation, Border, AA, Edge Effect and Shape Raycast
 - Chevron with Stretch or Equilateral proportions, direction, thickness, spread, cap, and join controls
 - Arc and Ring with Flat or Round caps
+- SpriteLessLine for straight lines and editable open polylines, with thickness, Flat/Round caps, Miter/Round joins and AA
 - Uniform or individual corner radii
 - Inside Border with anti-aliased inner edges
 - Directional Edge Effect for lightweight button and panel depth
 - Inset geometry anti-aliasing
 - RectTransform-based normalized UV mapping for custom UI materials
-- One `SpriteLessImage` component for every shape
+- One `SpriteLessImage` component for the built-in shapes; separate `SpriteLessLine` for editable paths
 - Button, Slider, Mask, RectMask2D, and Layout support
 - Optional shape-accurate raycast area for non-rectangular buttons
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- SpriteLessLine for straight lines and open polylines: normalized RectTransform points, uniform thickness, flat/round caps, bounded miter/round joins, inset geometry AA and UI material UVs.
+- Line creation menu and Scene point editing with insertion, removal, Undo and Prefab override recording.
+- Shift-drag either Line endpoint to extend it by one segment, with single-step Undo and Escape to cancel.
+- Runtime geometry regressions for zero/thin strokes, repeated points, reversals, short edges and maximum tessellation.
+
 ## [0.2.1] - 2026-09-10
 
 ### Added
