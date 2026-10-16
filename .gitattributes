@@ -1,0 +1,5 @@
+# Keep script and shader line endings stable on every checkout.
+*.cs text eol=lf
+*.shader text eol=lf
+*.cginc text eol=lf
+*.hlsl text eol=lf
