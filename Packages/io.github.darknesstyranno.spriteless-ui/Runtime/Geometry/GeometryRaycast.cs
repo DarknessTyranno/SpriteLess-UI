@@ -150,6 +150,11 @@ namespace SpriteLessUI.Geometry
         {
             Vector2 segment = second - first;
             Vector2 offset = point - first;
+            // Tiny rounded corners can collapse adjacent contour vertices to one point.
+            if (segment.sqrMagnitude <= Mathf.Epsilon)
+            {
+                return offset.sqrMagnitude <= Mathf.Epsilon;
+            }
             float cross = Mathf.Abs(Cross(segment, offset));
             float tolerance = Mathf.Max(1f, segment.magnitude) * 0.00001f;
             if (cross > tolerance)

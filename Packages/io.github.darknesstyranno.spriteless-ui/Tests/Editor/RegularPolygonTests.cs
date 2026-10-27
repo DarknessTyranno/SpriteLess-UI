@@ -117,6 +117,30 @@ namespace SpriteLessUI.Tests
             finally { Object.DestroyImmediate(go); }
         }
 
+        [TestCase(0.00000001f)]
+        [TestCase(0.000001f)]
+        public void TinyRoundingDoesNotExpandPolygonRaycast(float radius)
+        {
+            var go = new GameObject("Tiny rounded polygon", typeof(RectTransform), typeof(SpriteLessImage));
+            try
+            {
+                var image = go.GetComponent<SpriteLessImage>();
+                image.rectTransform.sizeDelta = new Vector2(100, 100);
+                image.Shape = ProceduralShape.RegularPolygon;
+                image.PolygonSides = 5;
+                image.PolygonRotation = 17;
+                foreach (float value in new[] { 0f, radius, 0f })
+                {
+                    image.PolygonRadius = value;
+                    Assert.That(image.ContainsLocalPoint(Vector2.zero), Is.True);
+                    Assert.That(image.ContainsLocalPoint(new Vector2(49, 49)), Is.False,
+                        $"Empty corner must not receive clicks at radius {value}.");
+                    Assert.That(image.ContainsLocalPoint(new Vector2(1000, 1000)), Is.False);
+                }
+            }
+            finally { Object.DestroyImmediate(go); }
+        }
+
         [TestCase(3, 0f)] [TestCase(4, 45f)] [TestCase(5, 17f)] [TestCase(64, 359f)]
         public void PerimeterHasEqualEdgesAndFitsNonSquareRect(int sides, float rotation)
         {

@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.0] - 2026-10-06
+
+First stable release of SpriteLess UI Core. Existing component names, serialized fields and asset GUIDs are preserved.
 
 ### Added
 
@@ -8,6 +10,10 @@
 - Line creation menu and Scene point editing with insertion, removal, Undo and Prefab override recording.
 - Shift-drag either Line endpoint to extend it by one segment, with single-step Undo and Escape to cancel.
 - Runtime geometry regressions for zero/thin strokes, repeated points, reversals, short edges and maximum tessellation.
+
+### Fixed
+
+- Shape raycasts no longer accept points outside regular polygons when their corner radius is extremely small. Added regression cases for tiny rounded pentagons.
 
 ## [0.2.1] - 2026-09-10
 
